@@ -1,0 +1,30 @@
+server.port: 0
+spring:
+  main:
+    web-environment: false
+sparks:
+  cargo:
+    internal: false
+    address: https://api.sparkworks.net
+    oauth2:
+      client:
+        accessTokenUrl: ${sparks.aa.address}/aa/oauth/token
+        clientId: ${sso.clientId}
+        clientSecret: ${sso.clientSecret}
+        username: ${sso.username}
+        password: ${sso.password}
+  aa:
+    address: https://sso.sparkworks.net
+
+sso:
+  username: ""
+  password: ""
+  clientId: ""
+  clientSecret: ""
+
+export:
+  from: 1546300800000
+  to: 1551398399000
+  uuids:
+    - "uuid1"
+    - "uuid2"
