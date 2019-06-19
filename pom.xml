@@ -26,26 +26,12 @@
 
     <repositories>
         <repository>
-            <id>sw-central</id>
-            <name>Private Sparks Repo</name>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <url>http://artifactory.sparkworks.net/nexus/repository/maven-releases/</url>
-        </repository>
-        <repository>
-            <id>sw-snapshot</id>
-            <name>Private Sparks Repo</name>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
+            <id>sw-public</id>
+            <name>Sparks Repo</name>
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
-            <url>http://artifactory.sparkworks.net/nexus/repository/maven-snapshots/</url>
+            <url>http://artifactory.sparkworks.net/nexus/repository/maven-public/</url>
         </repository>
     </repositories>
 
