@@ -3,7 +3,6 @@ package gr.cti.gaia.dataset.exporter.service;
 import net.sparkworks.cargo.client.GroupClient;
 import net.sparkworks.cargo.common.dto.GroupDTO;
 import net.sparkworks.cargo.common.dto.ResourceDTO;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,20 +22,11 @@ public class GroupService {
     private static final String OCCUPANCY_MOTION_UUID = "16dc9b05-16e7-4854-93c2-aa31cb63cc8c";
     private static final String OCCUPANCY_MOVEMENT_UUID = "a254b151-960c-4297-a862-f991ca2e2c51";
     
+    private final GroupClient groupClient;
+    
     @Autowired
-    GroupClient groupClient;
-    
-    public Collection<GroupDTO> listAll() {
-        return groupClient.listAll();
-    }
-    
-    public GroupDTO findByPath(final String path) {
-        for (final GroupDTO groupDTO : listAll()) {
-            if (StringUtils.equals(groupDTO.getPath(), path)) {
-                return groupDTO;
-            }
-        }
-        return null;
+    public GroupService(final GroupClient groupClient) {
+        this.groupClient = groupClient;
     }
     
     public GroupDTO findByUUID(final String uuid) {
@@ -69,7 +59,7 @@ public class GroupService {
         return res1 != null ? res1 : getResourceByPhenomenonUuid(groupDTO, OCCUPANCY_MOVEMENT_UUID);
     }
     
-    public ResourceDTO getResourceByPhenomenonUuid(final GroupDTO groupDTO, final String phenomenonUUID) {
+    private ResourceDTO getResourceByPhenomenonUuid(final GroupDTO groupDTO, final String phenomenonUUID) {
         final Iterator<ResourceDTO> resources = groupClient.getGroupResources(groupDTO.getUuid()).stream().filter(resourceDTO -> resourceDTO.getGroupUuid().equals(groupDTO.getUuid()) && resourceDTO.getPhenomenonUuid().toString().equals(phenomenonUUID)).distinct().collect(Collectors.toList()).iterator();
         return resources.hasNext() ? resources.next() : null;
     }

@@ -14,8 +14,12 @@ import java.util.ArrayList;
 @Service
 public class DataService {
     
+    private final DataClient dataClient;
+    
     @Autowired
-    DataClient dataClient;
+    public DataService(final DataClient dataClient) {
+        this.dataClient = dataClient;
+    }
     
     public QueryTimeRangeResourceDataResultDTO getData(ResourceDTO temperature, long from, long to) {
         QueryTimeRangeResourceDataDTO dto = new QueryTimeRangeResourceDataDTO();

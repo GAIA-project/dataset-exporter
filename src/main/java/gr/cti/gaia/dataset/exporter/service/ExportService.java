@@ -30,14 +30,18 @@ import java.util.TreeMap;
 @ConfigurationProperties("export")
 public class ExportService {
     
-    @Autowired
-    GroupService groupService;
-    @Autowired
-    DataService dataService;
+    private final GroupService groupService;
+    private final DataService dataService;
     
     private List<String> uuids;
     private Long from;
     private Long to;
+    
+    @Autowired
+    public ExportService(final GroupService groupService, final DataService dataService) {
+        this.groupService = groupService;
+        this.dataService = dataService;
+    }
     
     public void setUuids(final List<String> uuids) {
         this.uuids = uuids;
@@ -103,7 +107,6 @@ public class ExportService {
         final Calendar calendarFrom = Calendar.getInstance();
         calendarFrom.setTimeInMillis(fromTotal);
         final SortedMap<Long, DataPoint> dataPoints = new TreeMap<>();
-        final StringBuilder sb = new StringBuilder();
         do {
             final long from = calendarFrom.getTimeInMillis();
             log.info("{}\t{}\t{}", resourceName, String.format("%.0f%%", ((from - fromTotal) / diff) * 100), calendarFrom.getTime());
@@ -121,16 +124,15 @@ public class ExportService {
                     dataPoints.get(datum.getTimestamp()).setValue(datum.getReading());
                 }
             }
-            sb.append(".");
         } while (calendarFrom.getTimeInMillis() < toTotal);
         log.info("-------------------------------------------------------------------");
         
         try (final PrintWriter pw = new PrintWriter(new FileWriter(f, false))) {
-            pw.append("Epoch,Year,Month,Day,Hour,Minute," + StringUtils.capitalize(resourceName) + "\n");
+            pw.append("Epoch,Year,Month,Day,Hour,Minute,").append(StringUtils.capitalize(resourceName)).append("\n");
             for (final DataPoint value : dataPoints.values()) {
                 final Calendar cal = Calendar.getInstance();
                 cal.setTimeInMillis(value.getTimestamp());
-                pw.append(cal.getTimeInMillis() + "," + cal.get(Calendar.YEAR) + "," + (cal.get(Calendar.MONTH) + 1) + "," + cal.get(Calendar.DAY_OF_MONTH) + "," + cal.get(Calendar.HOUR_OF_DAY) + "," + cal.get(Calendar.MINUTE) + "," + String.format("%.2f", value.getValue()) + "\n");
+                pw.append(String.valueOf(cal.getTimeInMillis())).append(",").append(String.valueOf(cal.get(Calendar.YEAR))).append(",").append(String.valueOf(cal.get(Calendar.MONTH) + 1)).append(",").append(String.valueOf(cal.get(Calendar.DAY_OF_MONTH))).append(",").append(String.valueOf(cal.get(Calendar.HOUR_OF_DAY))).append(",").append(String.valueOf(cal.get(Calendar.MINUTE))).append(",").append(String.format("%.2f", value.getValue())).append("\n");
             }
             pw.flush();
         } catch (IOException e) {
@@ -146,7 +148,7 @@ public class ExportService {
             areas.put(buildingPath, groupDTO);
             FileUtils.forceMkdir(new File(buildingPath));
             final FileWriter fw = new FileWriter(new File(buildingPath + "/description.txt"));
-            fw.append("Building: " + buildingId + "\n");
+            fw.append("Building: ").append(buildingId).append("\n");
             fw.append("current: mA\n");
             fw.append("power: mWh\n");
             fw.append("temperature: C\n");
@@ -157,7 +159,7 @@ public class ExportService {
             for (GroupDTO subGroup : subGroups) {
                 log.info("subGroup: {}", subGroup);
                 final String subAreaId = exportLastPathParam(subGroup);
-                fw.append("Floor: " + subAreaId + "\n");
+                fw.append("Floor: ").append(subAreaId).append("\n");
                 fw.append("\t level: \n");
                 final String subGroupPath = "building" + buildingId + "/floor" + subAreaId;
                 areas.put(subGroupPath, subGroup);
@@ -166,7 +168,7 @@ public class ExportService {
                 for (GroupDTO floorSubGroup : floorSubGroups) {
                     log.info("floorSubGroup: {}", floorSubGroup);
                     final String floorSubAreaId = exportLastPathParam(floorSubGroup);
-                    fw.append("Room: " + floorSubAreaId + "\n");
+                    fw.append("Room: ").append(floorSubAreaId).append("\n");
                     fw.append("\t facing: \n");
                     fw.append("\t usage: \n");
                     final String floorSubGroupPath = "building" + buildingId + "/floor" + subAreaId + "/room" + floorSubAreaId;
