@@ -23,6 +23,16 @@ sso:
   clientSecret: ""
 
 export:
+  drillDown: true
+  metrics: false
+  data:
+      temperature: true
+      humidity: true
+      luminosity: true
+      noise: true
+      power: true
+      current: true
+      occupancy: true
   from: 1546300800000
   to: 1551398399000
   uuids:
