@@ -167,16 +167,9 @@ public class ExportService {
                 if (cal.get(Calendar.MONTH) == Calendar.JANUARY && cal.get(Calendar.DAY_OF_MONTH) < 6) {
                     continue;
                 }//exclude xmas
-    
+                
                 final StringBuilder line = new StringBuilder();
-                line.append(
-                        cal.getTimeInMillis())
-                        .append(",").append(cal.get(Calendar.YEAR))
-                        .append(",").append((cal.get(Calendar.MONTH) + 1))
-                        .append(",").append(cal.get(Calendar.DAY_OF_MONTH))
-                        .append(",").append(cal.get(Calendar.HOUR_OF_DAY))
-                        .append(",").append(cal.get(Calendar.MINUTE))
-                        .append(",").append(String.format("%.2f", value.getValue()));
+                line.append(cal.getTimeInMillis()).append(",").append(cal.get(Calendar.YEAR)).append(",").append((cal.get(Calendar.MONTH) + 1)).append(",").append(cal.get(Calendar.DAY_OF_MONTH)).append(",").append(cal.get(Calendar.HOUR_OF_DAY)).append(",").append(cal.get(Calendar.MINUTE)).append(",").append(String.format("%.2f", value.getValue()));
                 if (metrics) {
                     boolean skip = metricsService.checkValue(resource, value.getValue(), currentMetrics, line);
                     if (skip) {
@@ -188,20 +181,14 @@ public class ExportService {
                 pw.append(line.toString());
                 pw.flush();
             }
-            double pAbnormalLow = (currentMetrics.getAbnormalLow() / currentMetrics.getTotal()) * 100;
-            double pAbnormalHigh = (currentMetrics.getAbnormalHigh() / currentMetrics.getTotal()) * 100;
-            double pAbnormal = ((currentMetrics.getAbnormalHigh() + currentMetrics.getAbnormalLow()) / currentMetrics.getTotal()) * 100;
-            pw.append("rate,").append(String.valueOf(currentMetrics.getTotal()))
-                    .append(",").append(String.valueOf(currentMetrics.getAbnormalLow() + currentMetrics.getAbnormalHigh()))
-                    .append(",").append(String.valueOf(currentMetrics.getAbnormalLow()))
-                    .append(",").append(String.valueOf(currentMetrics.getAbnormalHigh()))
-                    .append(",").append(String.format("%.0f", pAbnormal))
-                    .append(",").append(String.format("%.0f", pAbnormalLow))
-                    .append(",").append(String.format("%.0f", pAbnormalHigh)).append("\n");
-            log.info("{}\ttotal:{}\tabnormal:{}\t{}%\tabnormalLow:{}\t{}%\tabnormalHigh:{}\t{}%", groupDTO.getName(), currentMetrics.getTotal(),
-                    (currentMetrics.getAbnormalLow() + currentMetrics.getAbnormalHigh()), String.format("%.1f", pAbnormal),
-                    currentMetrics.getAbnormalLow(), String.format("%.1f", pAbnormalLow),
-                    currentMetrics.getAbnormalHigh(), String.format("%.1f", pAbnormalHigh));
+            
+            if (metrics) {
+                double pAbnormalLow = currentMetrics.getAbnormalLowPercentage();
+                double pAbnormalHigh = currentMetrics.getAbnormalHighPercentage();
+                double pAbnormal = currentMetrics.getAbnormalPercentage();
+                pw.append("rate,").append(String.valueOf(currentMetrics.getTotal())).append(",").append(String.valueOf(currentMetrics.getAbnormalLow() + currentMetrics.getAbnormalHigh())).append(",").append(String.valueOf(currentMetrics.getAbnormalLow())).append(",").append(String.valueOf(currentMetrics.getAbnormalHigh())).append(",").append(String.format("%.0f", pAbnormal)).append(",").append(String.format("%.0f", pAbnormalLow)).append(",").append(String.format("%.0f", pAbnormalHigh)).append("\n");
+                log.info("{}\ttotal:{}\tabnormal:{}\t{}%\tabnormalLow:{}\t{}%\tabnormalHigh:{}\t{}%", groupDTO.getName(), currentMetrics.getTotal(), (currentMetrics.getAbnormalLow() + currentMetrics.getAbnormalHigh()), String.format("%.1f", pAbnormal), currentMetrics.getAbnormalLow(), String.format("%.1f", pAbnormalLow), currentMetrics.getAbnormalHigh(), String.format("%.1f", pAbnormalHigh));
+            }
             
         } catch (IOException e) {
             log.error(e.getLocalizedMessage(), e);

@@ -26,4 +26,15 @@ public class Metrics {
         abnormalHigh++;
     }
     
+    public double getAbnormalLowPercentage() {
+        return ((abnormalLow) / total) * 100;
+    }
+    
+    public double getAbnormalHighPercentage() {
+        return ((abnormalHigh) / total) * 100;
+    }
+    
+    public double getAbnormalPercentage() {
+        return ((abnormalHigh + abnormalLow) / total) * 100;
+    }
 }
